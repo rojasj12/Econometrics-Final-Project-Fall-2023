@@ -1,0 +1,1083 @@
+---
+title: "NFL Game Outcome Predictions Using Machine Learning"
+author: "Joel Rojas"
+date: "2023-12-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# I. Introduction
+
+In recent years, the fusion of sports and data analytics has emerged as a crucial aspect of performance analysis and prediction, especially in high-stakes, strategy-intensive sports like the NFL. This paper explores the application of various machine learning models, notably Random Forest, to predict NFL game outcomes. The study aims to assess the predictive power of machine learning techniques in accurately forecasting game results based on a comprehensive set of game-specific data, including play types, weather conditions, and team performances. The primary question is how machine learning models can predict NFL game outcomes effectively. The paper is structured into several key sections, including a literature review of relevant research, a detailed description of data and methodology, an in-depth statistical analysis, a comparative study of different models, including SVM and Logistic Regression, and finally, a conclusion that synthesizes the findings and offers directions for future research.
+
+# II. Literature Review
+
+## "Predicting the Outcome of NFL Games Using Logistic Regresion" by Stephen Bouzianis
+
+The research paper on predicting National Football League (NFL) game outcomes delves into the increasing importance of accurate prediction models in the context of the league's growing revenue, estimated at over $13.5 billion in 2017, and the burgeoning opportunity presented by legal sports gambling. With projections indicating a potential annual revenue gain of $2.326 billion from increased consumer engagement in games, the paper emphasizes the significance of reliable forecasting for consumers, NFL franchises, and the gambling industry. The inherent unpredictability of NFL games presents a challenge, which the study addresses by developing a predictive model using logistic regression, aiming to identify the most effective indicators of success and evaluate the accuracy of this methodology.
+
+The paper reviews existing models for predicting sports game outcomes, focusing on logistic regression due to its success in modeling relationships between independent variables and binary outcomes like wins or losses. The review also examines techniques such as Markov chains and Gaussian process predictive models, comparing their features and outcomes with logistic regression. Additionally, it includes insights from FiveThirtyEight's use of 'Elo' ratings for predictions and acknowledges the success of various models, underscoring the appropriateness of logistic regression for this study.
+
+Developing and validating a logistic regression model to predict NFL game outcomes forms the methodology's core. This process includes data preparation, variable selection, and model validation, addressing multicollinearity and overfitting concerns. Considering their attributes, unique models are created for each of the 32 NFL franchises. The paper details measures taken for data processing and feature selection to achieve model simplicity and accuracy. The model is validated using data from 2001 to 2016, with additional testing on the 2017 and 2018 seasons.
+
+The paper continues to discuss the accuracies achieved by different models, noting that teams with consistent performance, like the New England Patriots, had higher prediction accuracies. In comparison, teams with inconsistent performances showed lower accuracies. The comparison between models with varying numbers of variables indicates overfitting issues in larger models and more consistent accuracy in smaller models. Statistically significant variables for predicting wins are identified for each team, and the paper notes the significance of variables resulting from feature generation steps.
+
+The paper concludes by exploring the use of logistic regression to predict NFL game outcomes, focusing on transforming raw data into a predictive model. The limitations of sports outcome predictions are acknowledged, including factors like a team's desire, which are difficult to quantify. The study suggests alternative modeling techniques could yield more robust results and highlights the potential for predicting point spreads using linear regression. It also proposes applying similar techniques to other sports, such as NBA, NHL, or MLB games. It considers the applicability of logistic regression to sports with a higher volume of games.
+
+## "It’s Fourth Down and What Does the Bellman Equation Say? A Dynamic-Programming Analysis of Football Strategy" by David Romer
+
+The research paper provides a comprehensive analysis of decision-making in football, particularly focusing on the strategies employed by NFL teams during fourth down plays. Utilizing dynamic programming and data from over 700 NFL games, the study aims to estimate the values of various on-field scenarios to determine the most strategically sound decisions.
+
+A key finding of the paper is the discrepancy between the strategies recommended by the analysis and those actually employed by NFL teams. The study suggests a more aggressive approach, advocating for attempts at touchdowns when close to the end zone and going for first downs when around midfield. However, in practice, teams tend to opt for more conservative strategies, such as choosing field goals over touchdowns. This conservative approach, as the paper highlights, is often less optimal in terms of maximizing the probability of winning a game.
+
+The quantitative aspect of the study is particularly noteworthy. The paper estimates that adopting its recommended strategies could potentially increase a team's chances of winning by about 0.5%. This suggests significant potential gains from strategic optimization during fourth down plays.
+
+Moreover, the paper delves into the broader implications of its findings. It illustrates how the intersection of mathematical, statistical, and economic tools can offer profound insights into football decision-making. This analysis not only sheds light on the strategic aspects of football but also contributes to understanding the behavior of agents and the efficacy of optimization models in sports.
+
+The research also touches upon the concept of risk neutrality in teams' decision-making processes, particularly in relation to scoring. It suggests that teams might weigh the value of points differently based on various game situations, providing a nuanced view of how scoring impacts the probability of winning.
+
+In conclusion, the paper posits that NFL teams generally favor more conservative decisions on fourth downs than would be optimal for maximizing their chances of victory. This could stem from a preference to avoid risks or from a reliance on experience and intuition over formal analysis. The paper anticipates that the future of football strategy could evolve towards more victory-maximizing choices, driven by factors such as increased data availability, greater computing power, and the development of more sophisticated formal strategy analyses.
+
+## "nflWAR: A Reproducible Method for Offensive Player Evaluation In Football" by Ronal Yurko, Samuel Ventura, and Maksim Horowitz
+
+The research paper offers a comprehensive analysis of statistical methods in American football, focusing on innovative approaches to play and player evaluation. It begins by acknowledging the relative underdevelopment of statistical analysis in football compared to other major sports. The paper asserts the importance of objective evaluation of on-field decisions and player personnel, distinguishing two critical areas of focus: play evaluation and player evaluation. Traditional methods, such as yards gained or lost, are critiqued for their insufficiency due to the need for more contextual consideration in football. To address this, the paper introduces novel methods for play evaluation, including the concepts of expected points (EP) and win probability (WP). It points out the limitations of existing expected points models and advocates for a standardized approach. The development of the R package nflscrapR also aims to provide clean datasets and advanced metrics derived from NFL play-by-play data.
+
+In terms of play evaluation, the paper presents a new framework that utilizes EP and WP to estimate the value of football plays. This approach addresses the shortcomings of previous methodologies by directly modeling the probability of each scoring event and incorporating additional variables like score differentials and distance to the next score. The model employs multinomial logistic regression, calibrated using leave-one-season-out cross-validation. The concepts of expected points added (EPA) and win probability added (WPA) are introduced to assess player performance, considering factors such as air yards and yards after the catch for passing plays.
+
+For player evaluation, the research introduces the NFLWAR framework, a novel method for estimating wins above replacement (WAR) for NFL players. This framework focuses on estimating each play's value and individual players' impact on this value. It provides detailed analysis for offensive skill position players by breaking down their total value into components like WAR air, WAR yac, and WAR rush. However, the paper notes limitations in data availability, particularly for positions other than offensive skill players. The paper also addresses the challenge of allocating a play's value among multiple players, given the lack of publicly available data specifying which players are on the field for each play.
+The research also discusses new models for evaluating passing and rushing plays, highlighting the importance of crediting quarterbacks and receivers for the value gained through the air and after the catch. These models consider all passing attempts and account for different characteristics and distributions of play value added for QBs and non-QB rushers. The paper defines replacement levels for each position and introduces individual points/probability above average (iPAA) and above replacement (iPAR) values for player evaluation.
+
+The results present replacement-level designations for non-QB positions for the 2017 NFL season and compare WAR estimates for quarterbacks. It reveals that WAR values vary, suggesting that quarterbacks perform differently in various game situations. The paper emphasizes using the WPA-based version of WAR due to its direct relationship to winning games. The variability and consistency of player performance, especially among quarterbacks and running backs, are also explored, suggesting higher correlations for WAR than other commonly used statistics.
+
+The paper also discusses the broader implications of its findings. It underscores the importance of the nflscrapR package in providing access to clean, comprehensive NFL play-by-play data. The novel approaches in play evaluation using EP and WP models are highlighted, offering a more objective and reproducible method for assessing plays and player performance. The nflWAR framework is presented as a significant advancement in player evaluation, providing detailed insights into the unique contributions of players and the potential applications in areas like contract evaluation and draft analysis. The paper concludes by acknowledging the limitations in data access and encourages future research to enhance these models using additional data sources, including player-tracking data.
+
+
+# III. Data and Methodology
+
+The dataset for this study encompasses NFL game data from the years 2016 to 2023, obtained from nflfastR, a comprehensive source for detailed NFL play-by-play data. This dataset includes a wide range of variables, such as play types, yard lines, weather conditions, team performances, and game outcomes. The methodology involves extensive data cleaning and preprocessing to ensure data quality and relevance. Feature engineering is a critical component, where new variables are derived to encapsulate the strategic aspects of the games more effectively. The study employs the Random Forest algorithm, a robust machine learning technique known for handling large datasets with multiple input variables, to predict game outcomes. This approach allows for evaluating the significance of various game factors and their collective impact on predicting game results.
+
+
+## Libraries
+```{r warning=FALSE, message=FALSE}
+library(nflfastR)
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(zoo)
+library(slider)
+library(randomForest)
+library(caret)
+library(plotly)
+library(pdp)
+library(igraph)
+library(rpart.plot)
+library(partykit)
+library(ggplot2)
+library(reshape2)
+library(e1071)
+```
+
+## Data cleaning and Preprocessing Steps
+
+The first step in our data analysis involves loading NFL game data from 2016 to 2023 using the nflfastR package, which provides detailed play-by-play information. This comprehensive dataset is constructed by binding yearly data together. Subsequently, the data undergoes a rigorous cleaning process. The initial focus of cleaning is on filtering plays to include only 'run' and 'pass' types, considering plays where the action occurs beyond the 20-yard line, and excluding plays with penalty yards greater than 0 or with missing 'posteam' values.
+
+```{r warning=FALSE}
+years <- 2016:2023
+data <- do.call(rbind, lapply(years, nflfastR::load_pbp))
+
+cleaned_data <- data %>%
+  filter(play_type %in% c("run", "pass"), yardline_100 > 20, is.na(penalty_yards) | penalty_yards == 0, !is.na(posteam))
+
+```
+## Feature engineering details
+
+In the feature engineering section, we refine our dataset to include relevant variables for analysis.
+
+### Weather
+
+#### High-Wind
+
+A key step involves extracting and converting wind speed data from weather descriptions, crucial due to its potential impact on game dynamics. The process includes using string extraction to identify wind speeds and converting these to numerical values. To handle missing wind speed data, zeros are assigned, ensuring dataset consistency. Additionally, a binary variable 'high_wind' is introduced to signify games with significant wind speeds (20 mph or higher), acknowledging the influence of environmental factors on game outcomes.
+
+```{r warning=FALSE}
+cleaned_data$wind_speed_raw <- str_extract(cleaned_data$weather, "\\b\\d+ mph")
+cleaned_data$wind_speed <- as.numeric(str_extract(cleaned_data$wind_speed_raw, "\\d+"))
+
+cleaned_data$wind_speed[is.na(cleaned_data$wind_speed)] <- 0
+
+cleaned_data$high_wind <- ifelse(cleaned_data$wind_speed >= 20, 1, 0)
+
+```
+#### Rain or Snow
+
+The feature engineering process also involves categorizing weather conditions. A binary variable 'weather_condition' is created to indicate the presence of rain or snow, identified using string pattern matching from the weather descriptions. This variable captures the essence of adverse weather conditions, potentially impacting gameplay. To ensure data integrity, any infinite or missing values in 'weather_condition' are set to zero. Further, weather conditions are aggregated at the game level, creating variables like 'high_wind_game' and 'weather_condition_game' to encapsulate the overall weather scenario for each game.
+```{r warning=FALSE}
+cleaned_data$weather_condition <- ifelse(grepl("Rain", cleaned_data$weather) | grepl("Snow", cleaned_data$weather), 1, 0)
+
+cleaned_data$weather_condition[is.infinite(cleaned_data$weather_condition) | is.na(cleaned_data$weather_condition)] <- 0
+
+game_level_weather <- cleaned_data %>%
+  group_by(game_id) %>%
+  summarize(high_wind_game = max(high_wind, na.rm = TRUE),
+            weather_condition_game = max(weather_condition, na.rm = TRUE)) %>%
+  ungroup()
+
+```
+
+#### Redzone Part 1
+
+The Redzone analysis in this section focuses on evaluating teams' performance within the 20-yard line (Redzone). It involves filtering plays that occur in the Redzone and categorizing them based on play type and whether a touchdown was scored. The analysis includes aggregating Redzone entries and touchdowns for each team in each game. Furthermore, a comprehensive summary is created, combining these metrics with season and week information. 
+```{r warning=FALSE}
+
+all_teams_redzone_entries <- data %>%
+  filter(yardline_100 <= 20 & play_type %in% c("run", "pass")) %>%
+  group_by(game_id, posteam) %>%
+  summarize(
+    total_redzone_entries = n(),
+    .groups = 'drop'
+  )
+
+all_teams_redzone_touchdowns <- data %>%
+  filter(yardline_100 <= 20 & play_type %in% c("run", "pass") & touchdown == 1) %>%
+  group_by(game_id, posteam) %>%
+  summarize(
+    redzone_touchdowns = n(),
+    .groups = 'drop'
+  )
+
+all_teams_combinations <- data %>%
+  select(game_id, posteam) %>%
+  distinct()
+
+season_week_info <- data %>%
+  select(game_id, season, week) %>%
+  distinct()
+
+redzone_metrics_summary <- all_teams_combinations %>%
+  left_join(all_teams_redzone_entries, by = c("game_id", "posteam")) %>%
+  left_join(all_teams_redzone_touchdowns, by = c("game_id", "posteam")) %>%
+  left_join(season_week_info, by = "game_id") %>%
+  mutate(
+    total_redzone_entries = ifelse(is.na(total_redzone_entries), 0, total_redzone_entries),
+    redzone_touchdowns = ifelse(is.na(redzone_touchdowns), 0, redzone_touchdowns),
+    redzone_success_pct = ifelse(total_redzone_entries > 0, redzone_touchdowns / total_redzone_entries * 100, 0)
+  )
+
+redzone_metrics_summary <- redzone_metrics_summary %>%
+  filter(!is.na(posteam))
+
+```
+
+#### Categorizing Plays into Zones
+
+This section of feature engineering involves categorizing plays into specific zones based on play type and yards gained or air yards. It includes creating a new variable 'zone', distinguishing between short, intermediate, and deep runs or passes. The analysis also calculates the Expected Points Added (EPA) for each play in each zone and aggregates these at the game and team level. The dataset is further enriched by computing the percentage of EPA for each zone and reshaping the data into a wide format, integrating it with game-level weather data and team information. The final dataset provides a detailed view of each team's performance in different zones, enhancing the analysis of game strategies.
+
+```{r warning=FALSE, message=FALSE}
+
+cleaned_data <- data %>%
+  mutate(
+    zone = case_when(
+      play_type == "run" & yards_gained <= 10 ~ "zone_run_short",
+      play_type == "run" & yards_gained > 10 & yards_gained <= 20 ~ "zone_run_intermediate",
+      play_type == "run" & yards_gained > 20 ~ "zone_run_deep",
+      play_type == "pass" & air_yards <= 10 ~ "zone_pass_short",
+      play_type == "pass" & air_yards > 10 & air_yards <= 20 ~ "zone_pass_intermediate",
+      play_type == "pass" & air_yards > 20 ~ "zone_pass_deep",
+      TRUE ~ NA_character_  
+    ) ) %>%
+  filter(!is.na(posteam) & !is.na(zone))
+
+unique_game_ids <- unique(cleaned_data$game_id)
+
+all_combinations_list <- list()
+
+for (game_id in unique_game_ids) {
+    posteam_values <- unique(cleaned_data$posteam[cleaned_data$game_id == game_id])
+  
+  combinations <- expand.grid(
+    game_id = game_id,
+    posteam = posteam_values,
+    zone = c("zone_run_short", "zone_run_intermediate", "zone_run_deep", 
+             "zone_pass_short", "zone_pass_intermediate", "zone_pass_deep")
+  )
+  
+  all_combinations_list <- append(all_combinations_list, list(combinations))
+}
+
+all_combinations <- do.call(rbind, all_combinations_list)
+
+full_zone_data <- all_combinations %>%
+  left_join(cleaned_data, by = c("game_id", "posteam", "zone")) %>%
+  replace_na(list(epa = 0)) 
+
+zone_epa_summary <- full_zone_data %>%
+  group_by(game_id, posteam, zone) %>%
+  summarize(zone_epa = sum(epa, na.rm = TRUE)) %>%
+  ungroup()
+
+total_epa_per_game <- full_zone_data %>%
+  filter(!is.na(zone)) %>%
+  group_by(game_id, posteam) %>%
+  summarize(total_game_epa = sum(epa, na.rm = TRUE)) %>%
+  ungroup()
+
+zone_epa_percentage <- zone_epa_summary %>%
+  left_join(total_epa_per_game, by = c("game_id", "posteam")) %>%
+  mutate(zone_epa_percentage = zone_epa / total_game_epa * 100)
+
+zone_epa_wide <- zone_epa_percentage %>%
+  select(game_id, posteam, zone, zone_epa_percentage) %>%
+  pivot_wider(names_from = zone, values_from = zone_epa_percentage, names_prefix = "epa_pct_") %>%
+  left_join(game_level_weather, by = "game_id")
+
+game_teams <- data %>%
+  select(game_id, home_team, away_team) %>%
+  distinct()
+
+final_scores <- data %>%
+  group_by(game_id) %>%
+  summarize(final_home_score = max(total_home_score, na.rm = TRUE),
+            final_away_score = max(total_away_score, na.rm = TRUE)) %>%
+  ungroup() %>%
+  left_join(game_teams, by = "game_id") %>%
+  mutate(winner = case_when(
+    final_home_score > final_away_score ~ home_team,
+    final_home_score < final_away_score ~ away_team,
+    TRUE ~ "Tie"
+  ))
+
+game_details <- data %>%
+  select(game_id, season, week) %>%
+  distinct() %>%
+  left_join(final_scores, by = "game_id")
+
+final_dataset <- zone_epa_wide %>%
+  left_join(game_details, by = "game_id") %>%
+  mutate(game_winner = case_when(
+    winner == home_team ~ "Home",
+    winner == away_team ~ "Away",
+    TRUE ~ "Tie"
+  ))
+
+zone_success_summary <- cleaned_data %>%
+  group_by(game_id, posteam, zone) %>%
+  summarize(sum_success = sum(success)) %>%
+  ungroup()
+
+zone_success_wide <- zone_success_summary %>%
+  select(game_id, posteam, zone, sum_success) %>%
+  pivot_wider(names_from = zone, values_from = sum_success, names_prefix = "sum_success_")
+
+zone_success_wide <- zone_success_wide %>%
+  left_join(game_level_weather, by = "game_id") 
+
+final_dataset_with_success <- zone_success_wide %>%
+  left_join(game_details, by = "game_id") %>%
+  mutate(defteam = ifelse(posteam == home_team, away_team, home_team))
+
+final_dataset_with_success <- final_dataset_with_success %>%
+  mutate(across(starts_with("sum_success_"), ~ ifelse(is.na(.), 0, .))) %>%
+  filter(!is.na(posteam))
+
+head(final_dataset_with_success)
+```
+
+#### Cumulative Data for Model
+
+The Cumulative Data section is focused on preparing datasets for predictive modeling. It involves separating the dataset into offense and defense datasets, ensuring data integrity by filtering out missing team identifiers. Cumulative totals for each team within a season up to the current week are computed, offering insights into the team's performance progression. This calculation uses a custom function that applies cumulative summation and lagging to various success metrics. The datasets for offense and defense are then merged, ensuring correct matchup with opponents. Additionally, zone-specific metrics are aggregated, and the dataset is restructured for clarity, facilitating the development of a comprehensive model.
+
+```{r warning=FALSE}
+
+offense_dataset <- final_dataset_with_success %>%
+  filter(!is.na(posteam)) %>%
+  select(-defteam) %>%
+  rename(team = posteam)
+
+defense_dataset <- final_dataset_with_success %>%
+  filter(!is.na(defteam)) %>%
+  select(-posteam) %>%
+  rename(team = defteam)
+
+calculate_cumulative_totals <- function(dataset) {
+  dataset %>%
+    group_by(team, season) %>%
+    arrange(team, season, week) %>%
+        mutate(across(starts_with("sum_success_"), ~cumsum(. - lag(., default = first(.))))) %>%
+       mutate(across(starts_with("sum_success_"), lag, .names = "cumulative_{.col}", default = 0)) %>%
+    ungroup()
+}
+
+offense_dataset <- calculate_cumulative_totals(offense_dataset)
+defense_dataset <- calculate_cumulative_totals(defense_dataset)
+
+offense_dataset <- offense_dataset %>%
+  mutate(opponent_team = ifelse(team == home_team, away_team, home_team))
+
+defense_dataset <- defense_dataset %>%
+  rename(defense_team = team)
+
+merged_data <- left_join(offense_dataset, defense_dataset, 
+                         by = c("game_id", "opponent_team" = "defense_team"))
+
+zone_columns <- c(
+  "sum_success_zone_pass_deep",
+  "sum_success_zone_pass_intermediate",
+  "sum_success_zone_pass_short",
+  "sum_success_zone_run_deep",
+  "sum_success_zone_run_intermediate",
+  "sum_success_zone_run_short"
+)
+
+game_data_combined <- merged_data %>%
+  group_by(game_id) %>%
+  summarize(
+    season = first(season.x),
+    week = first(week.x),
+    home_team = first(home_team.x),
+    away_team = first(away_team.x),
+    final_home_score = first(final_home_score.x),
+    final_away_score = first(final_away_score.x),
+    winner = first(winner.x),
+    high_wind_game = first(high_wind_game.x),  
+    weather_condition_game = first(weather_condition_game.x), 
+    home_team_winner = ifelse(final_home_score > final_away_score, 1, 0),
+    across(all_of(paste0(zone_columns, ".x")), ~ ifelse(week == 1, 0, .x * 0.6 + .y * 0.4), na.rm = TRUE), 
+    across(all_of(paste0(zone_columns, ".y")), ~ ifelse(week == 1, 0, .x * 0.4 + .y * 0.6), na.rm = TRUE)  
+  ) %>%
+  ungroup() %>%
+  distinct(game_id, .keep_all = TRUE)
+
+game_data_combined$winning_team <- ifelse(game_data_combined$winner == game_data_combined$home_team, "home", "away")
+game_data_combined$winning_team <- as.factor(game_data_combined$winning_team)
+
+game_data_combined <- game_data_combined %>%
+  rename_at(vars(starts_with("sum_success_zone")), 
+            ~gsub("sum_success_", "", .)) %>%
+  rename_at(vars(ends_with("_x")), 
+            ~gsub("_x", "_home", .)) %>%
+  rename_at(vars(ends_with("_y")), 
+            ~gsub("_y", "_away", .))
+
+zone_columns_updated <- gsub("sum_success_", "", zone_columns)
+
+for (col in zone_columns_updated) {
+  colnames(game_data_combined) <- gsub(paste0(col, ".x"), paste0(col, "_home"), colnames(game_data_combined))
+  colnames(game_data_combined) <- gsub(paste0(col, ".y"), paste0(col, "_away"), colnames(game_data_combined))
+}
+```
+
+#### Redzone Pt 2
+In the second part of Redzone analysis, we further enhance our dataset by calculating cumulative redzone metrics. A specialized function computes cumulative totals for redzone entries and touchdowns for each team, across each season. It also incorporates lagged values to capture the progression of redzone performance over time. The resulting metric, redzone_success_pct_cumulative, reflects the overall efficiency in the redzone. These cumulative redzone metrics are then integrated into the main game data, providing a more nuanced view of team performance in critical scoring areas, both for home and away teams.
+
+```{r warning=FALSE}
+
+calculate_cumulative_redzone_totals <- function(dataset) {
+  dataset %>%
+    group_by(posteam, season) %>%
+    arrange(posteam, season, week) %>%
+    mutate(
+      cumulative_redzone_entries = cumsum(total_redzone_entries),
+      cumulative_redzone_touchdowns = cumsum(redzone_touchdowns),
+      lag_cumulative_redzone_entries = lag(cumulative_redzone_entries, default = 0),
+      lag_cumulative_redzone_touchdowns = lag(cumulative_redzone_touchdowns, default = 0)
+    ) %>%
+    ungroup() %>%
+    mutate(
+      redzone_success_pct_cumulative = ifelse(
+        lag_cumulative_redzone_entries > 0 | total_redzone_entries == 0,
+        lag_cumulative_redzone_touchdowns / lag_cumulative_redzone_entries * 100,
+        NA_real_
+      )
+    )
+}
+
+cumulative_redzone_metrics <- calculate_cumulative_redzone_totals(redzone_metrics_summary)
+
+cumulative_redzone_metrics <- cumulative_redzone_metrics %>%
+  mutate(redzone_success_pct_cumulative = ifelse(is.na(redzone_success_pct_cumulative), 0, redzone_success_pct_cumulative))
+
+game_data_combined <- game_data_combined %>%
+  left_join(cumulative_redzone_metrics %>% 
+              select(game_id, posteam, redzone_success_pct_cumulative) %>% 
+              rename(home_redzone_success_pct_cumulative = redzone_success_pct_cumulative),
+            by = c("game_id", "home_team" = "posteam"))
+
+game_data_combined <- game_data_combined %>%
+  left_join(cumulative_redzone_metrics %>% 
+              select(game_id, posteam, redzone_success_pct_cumulative) %>% 
+              rename(away_redzone_success_pct_cumulative = redzone_success_pct_cumulative),
+            by = c("game_id", "away_team" = "posteam"))
+
+head(game_data_combined)
+```
+
+#### Recent Form
+In the "Recent Form" section, we analyze the recent performance of NFL teams. We first create a dataset that includes information about each game, including the team, team score, and whether the team won. This dataset is then used to calculate two important metrics for each team:
+
+recent_avg_points: This metric represents the recent average points scored by the team in their previous games. It is calculated by taking the mean of the team's scores in the three most recent games (rolling average).
+
+recent_win_pct: This metric represents the recent win percentage of the team. It is calculated by taking the mean of the team's wins in the three most recent games (rolling average).
+
+These metrics provide insight into each team's recent form and performance, which can be valuable for predictive modeling and analysis. The team's recent form metrics are calculated separately for home and away games and are integrated into the main game data for further analysis.
+
+```{r warning=FALSE}
+
+all_games <- game_data_combined %>%
+  mutate(
+    team = home_team,
+    team_score = final_home_score,
+    is_winner = (winner == home_team)
+  ) %>%
+  select(game_id, season, week, team, team_score, is_winner) %>%
+  bind_rows(
+    game_data_combined %>%
+      mutate(
+        team = away_team,
+        team_score = final_away_score,
+        is_winner = (winner == away_team)
+      ) %>%
+      select(game_id, season, week, team, team_score, is_winner)
+  )
+
+recent_form <- all_games %>%
+  arrange(team, season, week) %>%
+  group_by(team, season) %>%
+  mutate(
+        recent_avg_points = lag(slider::slide_dbl(team_score, mean, .before = 2, .after = 0, .complete = TRUE), default = 0),
+       recent_win_pct = lag(slider::slide_dbl(is_winner, mean, .before = 2, .after = 0, .complete = TRUE), default = 0)
+  ) %>%
+  ungroup() %>%
+  select(game_id, team, recent_avg_points, recent_win_pct)
+
+game_data_combined <- game_data_combined %>%
+  left_join(recent_form, by = c("game_id", "home_team" = "team")) %>%
+  rename(
+    recent_avg_points_home = recent_avg_points,
+    recent_win_pct_home = recent_win_pct
+  )
+
+game_data_combined <- game_data_combined %>%
+  left_join(recent_form, by = c("game_id", "away_team" = "team")) %>%
+  rename(
+    recent_avg_points_away = recent_avg_points,
+    recent_win_pct_away = recent_win_pct
+  )
+
+game_data_combined <- game_data_combined %>%
+  mutate_all(~replace_na(., 0))
+
+```
+
+#### GameFlow & Setting to Factors
+In the "GameFlow" section, we categorize game flow based on the spread line:
+
+home_gameflow and away_gameflow categorize the game's competitiveness for the home and away teams, respectively.
+Values:
+1: Home team heavily favored (spread line <= -7).
+0: Neutral game flow (-7 < spread line < 7).
+2: Home team heavily unfavored (spread line >= 7).
+These categories help assess game competitiveness, perceived by Vegas.
+
+We also ensure to convert to factors any applicable features
+
+```{r warning=FALSE}
+
+spread_line_per_game <- cleaned_data %>%
+  group_by(game_id) %>%
+  summarize(spread_line = first(spread_line)) %>%  
+  ungroup()
+
+game_data_combined <- merge(game_data_combined, spread_line_per_game, by = "game_id")
+
+get_gameflow <- function(spread) {
+  if (spread <= -7) {
+    return(1)  
+  } else if (spread >= 7) {
+    return(2)  
+  } else {
+    return(0)  
+  }
+}
+
+game_data_combined$home_gameflow <- sapply(game_data_combined$spread_line, get_gameflow)
+game_data_combined$away_gameflow <- sapply(-game_data_combined$spread_line, get_gameflow)
+
+game_data_combined$home_gameflow <- as.factor(game_data_combined$home_gameflow)
+game_data_combined$away_gameflow <- as.factor(game_data_combined$away_gameflow)
+game_data_combined$high_wind_game <- as.factor(game_data_combined$high_wind_game)
+game_data_combined$weather_condition_game <- as.factor(game_data_combined$weather_condition_game)
+game_data_combined$home_team_winner <- as.factor(game_data_combined$home_team_winner)
+
+str(game_data_combined)
+summary(game_data_combined)
+
+```
+
+
+# IV. Statistical Analysis
+
+## Random Forrest Model
+In the "Random Forest Model" section, we perform the following steps:
+
+Data Splitting: We split the combined game data into two sets: a training set and a test set. The training set includes data from seasons prior to 2023, while the test set includes data from the 2023 season. This separation allows us to train the model on historical data and evaluate its performance on unseen data.
+
+Data Preparation (Beware of Data Leakage): In both the training and test sets, we remove several columns that are not needed for the model training and evaluation. These columns include final scores, winner information, season, week, game ID, spread line, and team names. It's important to note that when preparing the data, we take precautions to ensure there is no data leakage. Data leakage occurs when information from the test set inadvertently influences the model during training, leading to overly optimistic performance estimates. To prevent this, we make sure that the test data is not used in any way when training the model, preserving the integrity of the evaluation.
+
+Random Forest Model: We then build a Random Forest model for predicting the winning team (winning_team) based on the remaining features in the training data. The Random Forest model is an ensemble machine learning method that combines multiple decision trees to make predictions. We specify that the model should use 1,000 trees (ntree = 1000) and calculate feature importance.
+
+Prediction: Using the trained Random Forest model, we make predictions on the test data to determine the predicted winning teams.
+
+```{r warning=FALSE}
+
+set.seed(123)  
+
+trainData <- game_data_combined %>% filter(season < 2023)
+testData <- game_data_combined %>% filter(season == 2023)
+
+trainData <- trainData %>% select(-c(final_home_score, final_away_score, winner, home_team_winner, season, week, game_id, spread_line, home_team, away_team))
+testData <- testData %>% select(-c(final_home_score, final_away_score, winner, home_team_winner, season, week, game_id, spread_line, home_team, away_team))
+
+rf_model <- randomForest(winning_team ~ ., data = trainData, ntree = 1000, importance = TRUE)
+
+predictions <- predict(rf_model, testData)
+```
+### Specific Game Predictions
+Here we make predictions for a specific game in the 2023 season:
+
+We filter the dataset to select games from the specified season and week.
+We use a trained model (rf_model) to predict game winners based on game data.
+The predicted_games table shows the game ID, home team, away team, actual winner, and predicted winner for those specific games.
+
+```{r warning=FALSE}
+
+specific_season <- 2023
+specific_week <- 14
+
+specific_games <- game_data_combined %>% 
+  filter(season == specific_season, week == specific_week)
+
+specific_games_for_prediction <- specific_games %>%
+  select(-winning_team, -final_home_score, -final_away_score, -winner, -home_team_winner)
+
+specific_predictions <- predict(rf_model, specific_games_for_prediction)
+
+predicted_games <- specific_games %>%
+  select(game_id, home_team, away_team, winner) %>%
+  mutate(predicted_winner = specific_predictions)
+
+print(predicted_games)
+```
+
+## Results
+### Feature Importance
+```{r warning=FALSE}
+confusionMatrix(predictions, as.factor(testData$winning_team))
+```
+#### Confusion Matrix Summary
+The model demonstrates a modest yet somewhat balanced ability in predicting football game outcomes as either 'away' or 'home' wins.
+
+Key Performance Metrics:
+
+Accuracy: The model demonstrates a 60.77% accuracy, indicating it correctly predicts outcomes in approximately 61 out of every 100 games.
+
+Kappa Statistic: A value of 0.204 suggests a limited agreement beyond chance, highlighting room for improvement.
+
+Sensitivity for Away Wins: Identifies 54.84% of actual away wins, showing moderate predictive ability for away team victories.
+
+Specificity for Home Wins: Successfully predicts 65.52% of home team wins, indicating a higher accuracy in forecasting home victories.
+
+Positive Predictive Value (PPV): Indicates a 56.04% chance of correctly predicting away wins.
+
+Negative Predictive Value (NPV): Shows a 64.41% probability of accurately predicting home wins.
+
+Balanced Accuracy: At 60.18%, the model maintains a relatively balanced prediction capability for both home and away wins.
+
+Insights and Interpretation:
+
+The model exhibits a fair degree of accuracy, managing to maintain a reasonably balanced prediction ability for both home and away wins. This balance is crucial for the model's utility in a variety of game situations.
+
+The model slightly outperforms a no-information rate (NIR) prediction, as indicated by the P-Value of 0.05384 when comparing its accuracy to the NIR. This suggests that the model's forecasts are somewhat better than random guesses, though the margin is narrow.
+
+Areas for Improvement: The modest Kappa value and the close-to-chance P-Value highlight areas where the model could be enhanced. Enhancing the model's ability to differentiate between away and home wins, possibly through more nuanced features or advanced algorithms, might improve these metrics.
+
+In summary, while the model demonstrates an ability to predict football game outcomes better than random chance, it suggests potential areas for refinement to increase its predictive accuracy and consistency.
+
+```{r warning=FALSE}
+importance_data <- as.data.frame(importance(rf_model))
+importance_data$Feature <- rownames(importance_data)
+
+importance_chart <- plot_ly(importance_data, 
+        x = ~MeanDecreaseAccuracy, 
+        y = ~reorder(Feature, MeanDecreaseAccuracy), 
+        type = "bar",
+        orientation = 'h') %>%
+  layout(title = "Feature Importance",
+         xaxis = list(title = "Importance"),
+         yaxis = list(title = "Features"))
+importance_chart
+
+
+```
+
+#### Intepretation
+
+Environmental Conditions:
+
+High Wind Game: This variable shows a mixed impact on the model's accuracy with a minimal Mean Decrease in Accuracy (-0.0098) and a moderate Gini importance (2.686). This suggests a modest influence on the model's predictions, indicating that high wind conditions may slightly affect game outcomes but are not a major determinant.
+
+Weather Condition Game: Indicates a negative impact on accuracy with a substantial Mean Decrease in Accuracy (-3.887) and a Gini importance of 4.022. This implies that weather conditions significantly affect game outcomes, potentially introducing unpredictability or influencing team performances.
+
+Play Strategy Variables:
+
+Zone Passing and Running (Home and Away): These variables display a varied impact. For example, 'zone_pass_short_home' and 'zone_run_short_home' have high Gini importance scores (52.703 and 49.576, respectively), suggesting strong influences in determining game outcomes. This indicates that short passing and running plays at home are crucial factors in the model's predictions.
+Performance Metrics:
+
+Red Zone Success Percentage (Home and Away): Shows significant importance, especially 'away_redzone_success_pct_cumulative' with a high Gini importance of 70.288. This underscores the crucial role of a team's red zone efficiency, particularly for away teams, in predicting game outcomes.
+
+Recent Average Points and Win Percentage (Home and Away): Variables like 'recent_avg_points_away' and 'recent_win_pct_away' have notable Mean Decrease in Accuracy values (14.652 and 5.478, respectively). This emphasizes their importance, particularly for predicting away team performances, suggesting that recent scoring trends and win rates are key factors in the model's predictions.
+
+Game Flow Metrics:
+
+Home and Away Game Flow: Both variables exhibit high Mean Decrease in Accuracy (32.880 for home and 33.135 for away) and Gini importance. These scores highlight their significant roles in influencing the model's predictions. Game flow metrics, reflecting the dynamic aspects of how a game progresses, are evidently critical in determining game outcomes.
+Insights and Implications:
+
+The model places substantial emphasis on game flow, red zone efficiency, and recent team performance, indicating these as key areas for predicting football game outcomes.
+Environmental conditions, while showing an impact, appear to be less influential than strategic play variables and game flow metrics.
+
+The variation in Gini importance among different play strategy variables suggests a nuanced understanding of how specific types of plays contribute to the overall prediction accuracy.
+Improving predictions might involve focusing more on these identified key factors, particularly game flow and team performance metrics, which show a significant impact on the model's accuracy.
+
+
+# V. Feature Analysis
+
+## Recent Form
+### Recent Average Points
+
+```{r warning=FALSE}
+recent_home_plot <- ggplot(trainData, aes(x = recent_avg_points_home)) +
+  geom_histogram(binwidth = 1, fill = "blue", color = "black") +
+  labs(title = "Histogram of Recent Average Points at Home", x = "Recent Average Points Home", y = "Count")
+
+ggplotly(recent_home_plot)
+
+recent_away_plot <- ggplot(trainData, aes(x = recent_avg_points_away)) +
+  geom_histogram(binwidth = 1, fill = "red", color = "black") +
+  labs(title = "Histogram of Recent Average Points Away", x = "Recent Average Points Away", y = "Count")
+
+ggplotly(recent_away_plot)
+```
+The histograms for 'recent_avg_points_home' and 'recent_avg_points_away' in the dataset offer an insightful glimpse into the scoring trends of teams in their respective home and away games over a period. Notably, many games exhibit a zero average score at the beginning of the season. This phenomenon is attributed to calculating the average points, which relies on the last three games of a team. In the early season—specifically, the first three weeks—there are not enough past games to compute this rolling average, leading to a default average of zero.
+As the season advances beyond the initial weeks, the histograms become more populated with varied scores, reflecting the evolving performance of teams. These scores are calculated based on the most recent three games, thus providing a dynamic and current measure of a team's offensive capabilities. The distribution of these average points can reveal patterns and trends, such as which teams consistently score high or low in their games, offering valuable insights for strategies and predictions.
+
+### Recent Win Pct.
+
+```{r warning=FALSE}
+
+recentwinpct_home<- ggplot(trainData, aes(x = recent_win_pct_home)) +
+  geom_histogram(binwidth = 0.05, fill = "blue", color = "black") +
+  theme_minimal() +
+  labs(title = "Histogram of Recent Win Percentage - Home Teams",
+       x = "Recent Win Percentage",
+       y = "Frequency")
+ggplotly(recentwinpct_home)
+
+recentwinpct_away <- ggplot(trainData, aes(x = recent_win_pct_away)) +
+  geom_histogram(binwidth = 0.05, fill = "red", color = "black") +
+  theme_minimal() +
+  labs(title = "Histogram of Recent Win Percentage - Away Teams",
+       x = "Recent Win Percentage",
+       y = "Frequency")
+ggplotly(recentwinpct_away)
+
+```
+The histograms generated for the recent win percentages of home and away teams in our dataset provide insightful visualizations of the distribution of team performance in the weeks leading up to each game. These metrics are based on a rolling average of the teams' performances over their last three games.
+
+Home Teams' Recent Win Percentage Histogram: This graph shows how home teams have performed in the games leading up to their current matchup. The distribution can reveal trends such as whether home teams generally enter games on a winning streak or if their performance has been varied. It is important to note any peaks or skewness in the histogram, as these can indicate common trends in home team performance, potentially influenced by factors like home-field advantage or recent team dynamics.
+
+Away Teams' Recent Win Percentage Histogram: This graph shows the distribution of the away teams' performance in their last three games. Comparing this histogram to that of the home teams can be particularly telling. Differences in the distribution, such as variance or central tendency, suggest how playing away from home affects team performance or reflects different travel schedules and external pressures facing away teams.
+
+When analyzing these histograms, it is crucial to consider the context behind the numbers. For example, a team with a high recent win percentage might have a winning streak, indicating good form or morale, which could impact their upcoming game. Conversely, a lower win percentage might suggest a team struggling to find form. These insights, juxtaposed with other game-related factors like weather conditions, player injuries, or historical rivalry, can be valuable in predicting game outcomes or understanding team strategies.
+
+## Weather
+
+### High Wind Games
+
+```{r warning=FALSE}
+high_wind_plot <- ggplot(trainData, aes(x = high_wind_game)) +
+  geom_bar(fill = "coral", color = "black") +
+  labs(title = "Bar Chart of High Wind Games", x = "High Wind Game", y = "Count")
+
+ggplotly(high_wind_plot)
+```
+
+### Weather Condition
+
+```{r warning=FALSE}
+weather_condition_plot <- ggplot(trainData, aes(x = weather_condition_game)) +
+  geom_bar(fill = "blue", color = "black") +
+  labs(title = "Bar Chart of Weather Condition Games", x = "Weather Condition Game", y = "Count")
+
+ggplotly(weather_condition_plot)
+```
+
+The dataset's analysis of both 'high_wind_game' and 'weather_condition_game' variables indicates a significant prevalence of games played in average weather conditions without high wind or rain/snow. Specifically, 1863 games occurred without high wind and 1806 without rain or snow, compared to only 43 and 100 games, respectively, that encountered such conditions.
+
+This data distribution suggests extreme weather conditions like high wind and precipitation (rain/snow) are relatively rare occurrences. Consequently, assessing the true impact of these weather conditions on game dynamics becomes challenging due to the limited number of instances. In such scenarios, conclusions drawn from the available data might only partially capture the nuances and complexities introduced by these weather conditions on gameplay.
+
+A larger dataset encompassing more instances of these conditions is necessary to gain a more accurate and comprehensive understanding of how high wind and precipitation influence game outcomes, player performance, and overall game strategies. A broader dataset would provide a more prosperous and diverse pool of information, enabling analysts to discern better patterns and effects that might not be evident in a smaller sample.
+
+This necessity for a larger data sample underscores the importance of long-term data collection and analysis in sports analytics. It enables a more robust examination of less frequent but potentially influential factors like extreme weather conditions. With more extensive data, teams and analysts can better prepare for the unique challenges of such conditions and incorporate these insights into their strategies and decision-making processes.
+
+## Redzone
+```{r warning=FALSE}
+home_redzone_avg <- mean(game_data_combined$home_redzone_success_pct_cumulative, na.rm = TRUE)
+
+home_redzone_chart <- plot_ly(x = c("Average Redzone Success"), 
+                              y = c(home_redzone_avg), 
+                              type = "bar", 
+                              name = "Home Teams") %>%
+  layout(title = "Average Redzone Success Percentage - Home Teams",
+         xaxis = list(title = "Metric"),
+         yaxis = list(title = "Success Percentage"))
+
+home_redzone_chart
+
+away_redzone_avg <- mean(game_data_combined$away_redzone_success_pct_cumulative, na.rm = TRUE)
+
+away_redzone_chart <- plot_ly(x = c("Average Redzone Success"), 
+                              y = c(away_redzone_avg), 
+                              type = "bar", 
+                              name = "Away Teams") %>%
+  layout(title = "Average Redzone Success Percentage - Away Teams",
+         xaxis = list(title = "Metric"),
+         yaxis = list(title = "Success Percentage"))
+
+away_redzone_chart
+```
+The analysis of red zone success rates for home and away teams reveals a striking similarity, with no apparent distinct advantage for either side. The data, focusing on the percentage of red zone trips culminating in touchdowns, indicates a nearly parallel performance between home and away teams.
+
+The average red zone success percentage for home teams is just slightly above 19%, demonstrating their ability to capitalize on scoring opportunities within their familiar home environment. However, this minimal advantage only significantly sets them apart from their away counterparts.
+
+Similarly, away teams exhibit an almost identical level of proficiency in the red zone, with their success rate marginally below 19%. This suggests that despite the challenges typically associated with playing in an unfamiliar or hostile environment, away teams can maintain a red zone efficiency comparable to home teams.
+
+The bar charts for both home and away teams underscore this parity. The similarity in their success percentages suggests that factors other than the playing venue play a more critical role in determining red zone efficiency. This could include team-specific strategies, player performance, coaching decisions, or other situational factors that equally affect home and away teams.
+
+## Gameflow: Vegas
+```{r warning=FALSE}
+merged_data_gameflow <- cleaned_data %>%
+  inner_join(game_data_combined, by = "game_id")
+
+relevant_plays <- merged_data_gameflow %>%
+  filter(play_type %in% c("run", "pass"))
+
+gameflow_analysis <- relevant_plays %>%
+  group_by(game_id, home_gameflow, away_gameflow) %>%
+  summarize(
+    total_pass_plays_home = sum(play_type == "pass" & posteam == home_team.x),
+    total_run_plays_home = sum(play_type == "run" & posteam == home_team.x),
+    total_pass_plays_away = sum(play_type == "pass" & posteam == away_team.x),
+    total_run_plays_away = sum(play_type == "run" & posteam == away_team.x)
+  ) %>%
+  ungroup()
+
+avg_neutral <- gameflow_analysis %>%
+  filter(home_gameflow == 0) %>%
+  summarise(avg_pass_plays = mean(total_pass_plays_home),
+            avg_run_plays = mean(total_run_plays_home))
+
+neutral_chart <- plot_ly(avg_neutral) %>%
+  add_trace(x = c('Pass Plays'), y = ~avg_pass_plays, type = 'bar', name = 'Pass Plays') %>%
+  add_trace(x = c('Run Plays'), y = ~avg_run_plays, type = 'bar', name = 'Run Plays') %>%
+  layout(title = "Average Home Team Plays in Neutral Game Script", 
+         xaxis = list(title = "Play Type"),
+         yaxis = list(title = "Average Number of Plays"))
+
+neutral_chart
+
+avg_run_heavy <- gameflow_analysis %>%
+  filter(home_gameflow == 1) %>%
+  summarise(avg_pass_plays = mean(total_pass_plays_home),
+            avg_run_plays = mean(total_run_plays_home))
+
+run_heavy_chart <- plot_ly(avg_run_heavy) %>%
+  add_trace(x = c('Pass Plays'), y = ~avg_pass_plays, type = 'bar', name = 'Pass Plays') %>%
+  add_trace(x = c('Run Plays'), y = ~avg_run_plays, type = 'bar', name = 'Run Plays') %>%
+  layout(title = "Average Home Team Plays in Run-Heavy Game Script", 
+         xaxis = list(title = "Play Type"),
+         yaxis = list(title = "Average Number of Plays"))
+
+run_heavy_chart
+
+avg_pass_heavy <- gameflow_analysis %>%
+  filter(home_gameflow == 2) %>%
+  summarise(avg_pass_plays = mean(total_pass_plays_home),
+            avg_run_plays = mean(total_run_plays_home))
+
+pass_heavy_chart <- plot_ly(avg_pass_heavy) %>%
+  add_trace(x = c('Pass Plays'), y = ~avg_pass_plays, type = 'bar', name = 'Pass Plays') %>%
+  add_trace(x = c('Run Plays'), y = ~avg_run_plays, type = 'bar', name = 'Run Plays') %>%
+  layout(title = "Average Home Team Plays in Pass-Heavy Game Script", 
+         xaxis = list(title = "Play Type"),
+         yaxis = list(title = "Average Number of Plays"))
+
+pass_heavy_chart
+
+```
+In an insightful examination of home team play choices across various game scenarios, the analysis distinguished three game-flow categories based on Vegas expectations: neutral, run-heavy, and pass-heavy. This investigation, grounded in a dataset inclusive of actual game outcomes, revealed a consistent preference for passing plays in all scenarios.
+
+Neutral Game Script: In games with a balanced setting, where neither team was significantly favored, home teams showed a preference for passing plays. This trend suggests that passing is a favored approach even without a clear strategic advantage.
+
+Run-Heavy Game Script: In situations where the home team was expected to lead (run-heavy), it was anticipated that run plays would dominate to maintain the lead and control the game clock. However, the analysis showed a slightly higher average number of pass plays, indicating a deviation from traditional play-calling norms.
+
+Pass-Heavy Game Script: Consistent with expectations, the number of pass plays exceeded run plays in scenarios where the home team was likely trailing (pass-heavy). This aligns with conventional strategy, where passing is often relied upon to gain ground quickly. However, the ratio of pass-to-run plays was similar to the other game-flow situations.
+
+Using a dataset encompassing actual game outcomes for this analysis adds significant value, offering a realistic picture of team strategies and decision-making processes. These insights could enhance game preparation and decision-making, contributing to more nuanced and effective football strategies.
+
+
+## Gameflow: Actual Game Outcomes
+```{r warning=FALSE}
+
+calculate_actual_gameflow <- function(final_home_score, final_away_score) {
+  if (final_home_score == final_away_score) {
+    return("Neutral")
+  } else if (final_home_score > final_away_score) {
+    return("Leading")
+  } else {
+    return("Trailing")
+  }
+}
+
+relevant_plays$actual_home_gameflow <- mapply(calculate_actual_gameflow, relevant_plays$final_home_score, relevant_plays$final_away_score)
+
+gameflow_analysis_actual <- relevant_plays %>%
+  group_by(game_id, actual_home_gameflow) %>%
+  summarize(
+    total_pass_plays_home = sum(play_type == "pass" & posteam == home_team.x),
+    total_run_plays_home = sum(play_type == "run" & posteam == home_team.x)
+  ) %>%
+  ungroup()
+
+avg_neutral_actual <- gameflow_analysis_actual %>%
+  filter(actual_home_gameflow == "Neutral") %>%
+  summarise(avg_pass_plays = mean(total_pass_plays_home),
+            avg_run_plays = mean(total_run_plays_home))
+
+avg_leading_actual <- gameflow_analysis_actual %>%
+  filter(actual_home_gameflow == "Leading") %>%
+  summarise(avg_pass_plays = mean(total_pass_plays_home),
+            avg_run_plays = mean(total_run_plays_home))
+
+avg_trailing_actual <- gameflow_analysis_actual %>%
+  filter(actual_home_gameflow == "Trailing") %>%
+  summarise(avg_pass_plays = mean(total_pass_plays_home),
+            avg_run_plays = mean(total_run_plays_home))
+
+neutral_chart_actual <- plot_ly(avg_neutral_actual) %>%
+  add_trace(x = c('Pass Plays'), y = ~avg_pass_plays, type = 'bar', name = 'Pass Plays') %>%
+  add_trace(x = c('Run Plays'), y = ~avg_run_plays, type = 'bar', name = 'Run Plays') %>%
+  layout(title = "Average Home Team Plays in Actual Neutral Game Script", 
+         xaxis = list(title = "Play Type"), yaxis = list(title = "Average Number of Plays"))
+
+leading_chart_actual <- plot_ly(avg_leading_actual) %>%
+  add_trace(x = c('Pass Plays'), y = ~avg_pass_plays, type = 'bar', name = 'Pass Plays') %>%
+  add_trace(x = c('Run Plays'), y = ~avg_run_plays, type = 'bar', name = 'Run Plays') %>%
+  layout(title = "Average Home Team Plays in Actual Leading Game Script (Run-Heavy)", 
+         xaxis = list(title = "Play Type"), yaxis = list(title = "Average Number of Plays"))
+
+trailing_chart_actual <- plot_ly(avg_trailing_actual) %>%
+  add_trace(x = c('Pass Plays'), y = ~avg_pass_plays, type = 'bar', name = 'Pass Plays') %>%
+  add_trace(x = c('Run Plays'), y = ~avg_run_plays, type = 'bar', name = 'Run Plays') %>%
+  layout(title = "Average Home Team Plays in Actual Trailing Game Script (Pass-Heavy)", 
+         xaxis = list(title = "Play Type"), yaxis = list(title = "Average Number of Plays"))
+
+
+neutral_chart_actual
+leading_chart_actual
+trailing_chart_actual
+
+
+
+```
+Gameflow Based on Vegas Lines:
+
+In the initial set of charts based on predicted game scripts according to Vegas lines, we observed a consistent trend across all scenarios (Neutral et al.). The home teams, irrespective of the expected game script, tended to pass more than run. This finding was unexpected, especially in predicted run-heavy situations, suggesting that teams might not always follow the anticipated game script.
+
+Gameflow Based on Actual Game Outcomes:
+
+In contrast, the second set of charts, derived from actual game outcomes, presented a more intuitive pattern:
+
+Neutral Situations: Similar to the predicted scenarios, teams in neutral game situations (where the scores were close) continued to favor passing over running, though not as pronounced as seen in the Vegas-based predictions.
+
+Leading: When leading, the home teams shifted their strategy, balancing passing and running plays. This is a typical approach in real-world scenarios, as teams leading in the score often rely on running plays to control the game clock and secure their lead.
+
+Trailing: There was a significant shift towards passing plays in trailing scenarios. This aligns with conventional football strategy, where teams behind in score resort to passing to cover more ground quickly and attempt a comeback.
+
+Comparative Insights:
+
+The analysis of game flow based on actual game outcomes reveals a precise alignment with traditional football strategies. This contrast with the Vegas line-based predictions highlights a critical aspect: actual game conditions, such as leading or trailing in the score, significantly influence a team's play-calling strategy.
+
+Notably, the game followed logical patterns: Teams tended to balance running and passing when leading while heavily favoring passing when trailing. This behavior aligns with standard football tactics, where controlling the clock and quickly covering the ground are essential in these scenarios.
+
+The discrepancy observed between the predicted game scripts (based on Vegas lines) and the actual game scenarios suggests that Vegas lines might not be reliable indicators of a team's play-calling strategy. 
+
+This insight is particularly relevant for predictive modeling in sports analytics. It suggests that models that can more accurately anticipate the actual game flow - considering factors like scoreline, team tendencies, and situational football - could gain a significant advantage in predicting game outcomes. 
+
+## Zones
+```{r warning=FALSE}
+
+final_dataset_with_success <- final_dataset_with_success %>%
+  mutate(posteam_winner = ifelse(posteam == winner, 1, 0))
+
+zone_columns_to_replace <- c(
+  "sum_success_zone_pass_deep",
+  "sum_success_zone_pass_intermediate",
+  "sum_success_zone_pass_short",
+  "sum_success_zone_run_deep",
+  "sum_success_zone_run_intermediate",
+  "sum_success_zone_run_short"
+)
+
+correlations <- sapply(zone_columns_to_replace, function(zone_col) {
+  cor(final_dataset_with_success[[zone_col]], final_dataset_with_success$posteam_winner)
+})
+
+correlation_data <- data.frame(
+  Zone = zone_columns_to_replace,
+  Correlation_with_Posteam_Winning = correlations
+)
+
+correlation_chart <- plot_ly(
+  data = correlation_data,
+  x = ~Zone,
+  y = ~Correlation_with_Posteam_Winning,
+  type = 'bar',
+  marker = list(color = 'blue')  
+) %>%
+  layout(
+    title = "Correlation between Zones and Posteam Winning",
+    xaxis = list(title = "Zones"),
+    yaxis = list(title = "Correlation with Posteam Winning")
+  )
+
+correlation_chart
+
+```
+
+Several interesting patterns emerge when analyzing the correlation between different zones and the likelihood of the posteam (the offensive team) winning the game. One of the most notable findings is that successful running plays in the short zone correlate positively with posteam winning. This suggests that teams that execute short-distance running plays effectively, especially in crucial game situations, are more likely to secure victories. These short runs are often used to control the clock, gain critical yardage, and maintain possession of the ball when it matters most.
+
+Moreover, running plays in the deep and intermediate zones positively correlate with winning, although they are slightly lower than short runs. This finding aligns with the idea that explosive plays, such as long-distance runs, can significantly impact a team's success. These runs can result in game-changing moments and quickly shift the momentum in favor of the posteam.
+
+In contrast, deep and intermediate passing plays positively correlate with posteam winning. Successful deep passes and intermediate throws contribute positively to a team's success. These passing plays are often associated with explosive plays, which can lead to quick scoring opportunities and pressure the opposing team.
+
+It is important to note that these correlations focus solely on offensive success within specific zones and do not consider the combined impact of offensive and defensive performances in these zones. While the analysis sheds light on offensive strategies that favor winning, it should be viewed with other factors, such as game flow and overall team dynamics. Teams that are winning usually make explosive plays and run the ball more, as shown in the previous analysis regarding game flow. This underscores the importance of a balanced offensive approach and adaptability to different in-game situations.
+
+
+# VI. Additional Models
+## SVM
+
+I decided to complement my primary Random Forest model with a Support Vector Machine (SVM) for comparative analysis. This approach was straightforward, leveraging my existing dataset without the need for extensive preprocessing, as the SVM in R can handle factor variables effectively.
+
+I began by training the SVM model using the default settings. This step was crucial for establishing a baseline of the model's performance. After training, I utilized the test dataset for predictions. To assess the effectiveness of the SVM model, I created a confusion matrix and calculated its accuracy. This provided a clear view of how well the model performed with the standard setup.
+
+The results from the confusion matrix and the accuracy score gave me insights into the initial capabilities of the SVM model. This evaluation helped me understand the strengths and limitations of using SVM in my predictive analysis, alongside the primary Random Forest model.
+
+```{r warning=FALSE}
+
+svm_model <- svm(winning_team ~ ., data = trainData, kernel = "radial")
+
+svm_predictions <- predict(svm_model, testData)
+
+confusionMatrix <- table(Predicted = svm_predictions, Actual = testData$winning_team)
+accuracy <- sum(diag(confusionMatrix)) / sum(confusionMatrix)
+print(confusionMatrix)
+print(paste("Accuracy:", accuracy))
+```
+
+## Logistic Regression
+
+For my logistic regression model, which is another technique I'm exploring alongside my main Random Forest model, I began by preprocessing the data. This step involved removing certain columns that were not necessary for the model, like game IDs and team names, and transforming the target variable into a numeric format. This preprocessing was crucial to ensure the data was in the right shape for logistic regression modeling.
+
+After preparing the data, I trained the logistic regression model using the filtered dataset from seasons prior to 2023. Logistic regression is a different approach compared to Random Forest, and I was keen to see how it performed with the same data.
+
+To evaluate the model, I used a custom function that not only predicted the outcomes on the 2023 season data but also calculated the model's accuracy. It provided a confusion matrix, which was instrumental in understanding the model's performance in terms of true positives, false positives, true negatives, and false negatives.
+
+Finally, I printed out the confusion matrix and the accuracy of the logistic regression model. This allowed me to compare its performance against the Random Forest model, giving me insights into which model was more effective in predicting the outcomes based on the given data.
+
+```{r warning=FALSE}
+
+preprocess_data <- function(data) {
+  data %>%
+    select(-c(game_id, season, week, home_team, away_team, final_home_score, final_away_score, winner, home_team_winner, spread_line)) %>%
+    mutate(winning_team = as.numeric(winning_team == "home"))
+}
+
+evaluate_model <- function(model, test_data) {
+  predicted_probabilities <- predict(model, newdata = test_data, type = "response")
+  predicted_classes <- ifelse(predicted_probabilities > 0.5, 1, 0)
+  confusionMatrix <- table(Predicted = predicted_classes, Actual = test_data$winning_team)
+  accuracy <- sum(diag(confusionMatrix)) / sum(confusionMatrix)
+  list(confusionMatrix = confusionMatrix, Accuracy = accuracy)
+}
+
+
+trainDataLR <- preprocess_data(game_data_combined %>% filter(season < 2023))
+testDataLR <- preprocess_data(game_data_combined %>% filter(season == 2023))
+
+
+logistic_model <- glm(winning_team ~ ., data = trainDataLR, family = "binomial")
+
+
+model_evaluation <- evaluate_model(logistic_model, testDataLR)
+
+
+print(model_evaluation$confusionMatrix)
+print(paste("Accuracy:", model_evaluation$Accuracy))
+```
+
+## Additional Models Performance vs RF
+
+Some critical insights that are relevant to the project goals in the comparative analysis of the Support Vector Machine (SVM), Logistic Regression, and Random Forest (RF) models emerged. The SVM and RF models both demonstrated an impressive accuracy rate of approximately 61.06%, indicating their robustness in predictive capability. However, the Logistic Regression model, with an accuracy of around 57.69%, lagged slightly behind the other two models. Despite this, it still holds value for its simplicity and interpretability, which can be crucial in scenarios where understanding the model's decision-making process is essential.
+The RF model, notable for its ability to handle complex interactions between variables, matched the SVM's overall accuracy. However, it showed a slightly higher sensitivity, being more adept at correctly identifying 'away' wins. The specificity of both models, which measures the correct identification of 'home' wins, was comparable, indicating a balanced performance across different prediction classes.
+
+When considering the application of these models in a practical setting, the choice depends on the specific requirements of the analysis. If the primary objective is to maximize overall accuracy, both the SVM and RF models are equally compelling choices. However, for scenarios that focus on predicting a particular outcome, such as the likelihood of an 'away' team winning, the model with a higher sensitivity or specificity for that outcome would be preferable.
+
+In summary, the SVM and RF models, with their comparable accuracy rates, offer robust options for predictive analysis. The specific needs of the analysis should guide the choice between them, whether it be overall accuracy, sensitivity, specificity, or model interpretability. While less accurate, the Logistic Regression model provides a simpler alternative that can be beneficial in contexts where ease of understanding the model's decisions is a priority.
+
+# VII. Conclusion
+
+This study has demonstrated the potential of machine learning models, particularly Random Forest, SVM, and Logistic Regression, in predicting NFL game outcomes. The key findings include:
+
+Random Forest's Robust Performance: The Random Forest model showed a balanced performance with an accuracy of approximately 61.06%, effectively handling the complexities and interactions within the dataset.
+
+SVM's Comparable Accuracy: The Support Vector Machine also exhibited a similar accuracy level, making it a strong contender for predictive analysis in sports.
+Logistic Regression's Simplicity: Despite its slightly lower accuracy of 57.69%, it offers an interpretable valuable model for scenarios where understanding the decision-making process is crucial.
+
+Importance of Game-Specific Factors: The study highlighted the significance of various factors, such as weather conditions, play types, and team performances, particularly red zone efficiency and game flow, in influencing game outcomes.
+
+Challenges of Predictive Modeling in Sports: The complexity of sports environments, marked by unpredictable factors like team morale and player conditions, poses a significant challenge to predictive modeling.
+
+Limitations of the study include potential biases in the dataset, the exclusion of certain subjective factors like player injuries or team morale, and the inherent unpredictability of sports events. In order to improve the efficacy of predictive models in sports analytics, further investigation could be conducted on the following:
+
+ The Integration of Real-Time Data: Including data like player tracking and real-time performance metrics for more dynamic predictions.
+ 
+ Advanced Machine Learning Techniques: Exploring deep learning and neural networks for more nuanced analysis.
+
+Cross-Sport Comparative Studies: Analyzing the effectiveness of these models across different sports to identify universal predictive factors.
+
+In summary, while the study offers valuable insights into the application of machine learning in sports analytics, it also opens avenues for more comprehensive, real-time, and sophisticated analytical approaches in the future.
+
+# VIII. References
+
+Bouzianis, S. (2019). Predicting the Outcome of NFL Games Using Logistic Regression. University of New Hampshire Honors Theses and Capstones. 474. Retrieved from https://scholars.unh.edu/honors/474
+
+Romer, D. (2002). It's Fourth Down and What Does The Bellman Equation Say? A Dynamic-Programming Analysis of Football Strategy. NBER Working Paper No. 9024. National Bureau of Economic Research. June 2002. Retrieved from http://www.nber.org/papers/w9024.
+
+Yurko, R., Ventura, S., & Horowitz, M. (2018). nflWAR: A Reproducible Method for Offensive Player Evaluation in Football (Extended Edition). Department of Statistics & Data Science, Carnegie Mellon University. July 13, 2018.
+
+
+
+
